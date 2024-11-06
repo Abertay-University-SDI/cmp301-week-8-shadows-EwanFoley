@@ -81,7 +81,7 @@ float4 main(InputType input) : SV_TARGET
         // Has depth map data
         if (!isInShadow(depthMapTexture[0], pTexCoord, input.lightViewPos1, shadowMapBias, 0))
         {
-            // is NOT in shadow1, therefore light1
+            // not in shadow1, therefore light1
             colour += calculateLighting(-direction[0], input.normal, diffuse[0]);
         }
     }
