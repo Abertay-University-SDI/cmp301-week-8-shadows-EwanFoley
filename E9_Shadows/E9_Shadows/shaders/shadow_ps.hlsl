@@ -3,7 +3,7 @@ Texture2D shaderTexture : register(t0);
 Texture2D depthMapTexture[2] : register(t1);
 
 SamplerState diffuseSampler  : register(s0);
-SamplerState shadowSampler[2] : register(s1);
+SamplerState shadowSampler : register(s1);
 
 cbuffer LightBuffer : register(b0)
 {
@@ -40,10 +40,10 @@ bool hasDepthData(float2 uv)
     return true;
 }
 
-bool isInShadow(Texture2D sMap, float2 uv, float4 lightViewPosition, float bias, int index)
+bool isInShadow(Texture2D sMap, float2 uv, float4 lightViewPosition, float bias)
 {
     // Sample the shadow map (get depth of geometry)
-    float depthValue = sMap.Sample(shadowSampler[index], uv).r;
+    float depthValue = sMap.Sample(shadowSampler, uv).r;
 	// Calculate the depth from the light.
     float lightDepthValue = lightViewPosition.z / lightViewPosition.w;
     lightDepthValue -= bias;
@@ -79,7 +79,7 @@ float4 main(InputType input) : SV_TARGET
     if (hasDepthData(pTexCoord))
     {
         // Has depth map data
-        if (!isInShadow(depthMapTexture[0], pTexCoord, input.lightViewPos1, shadowMapBias, 0))
+        if (!isInShadow(depthMapTexture[0], pTexCoord, input.lightViewPos1, shadowMapBias))
         {
             // not in shadow1, therefore light1
             colour += calculateLighting(-direction[0], input.normal, diffuse[0]);
@@ -87,18 +87,18 @@ float4 main(InputType input) : SV_TARGET
     }
 
     if (hasDepthData(pTexCoord2)) {
-        if (!isInShadow(depthMapTexture[1], pTexCoord2, input.lightViewPos2, shadowMapBias, 1)) {
+        if (!isInShadow(depthMapTexture[1], pTexCoord2, input.lightViewPos2, shadowMapBias)) {
             //not in shadow2, therefore light2
             colour += calculateLighting(-direction[1], input.normal, diffuse[1]);
         }
     }
 
-    //if (hasDepthData(pTexCoord) && hasDepthData(pTexCoord2)) {
-    //    if (!isInShadow(depthMapTexture, pTexCoord, input.lightViewPos1, shadowMapBias, 0) && !isInShadow(depthMap2Texture, pTexCoord2, input.lightViewPos2, shadowMapBias, 1)) {
-    //        //not in either shadow, therefore both lights
-    //        colour = calculateLighting(-direction[0], input.normal, diffuse[0]) + calculateLighting(-direction[1], input.normal, diffuse[1]);
-    //    }
-    //}
+    if (hasDepthData(pTexCoord) && hasDepthData(pTexCoord2)) {
+        if (!isInShadow(depthMapTexture[0], pTexCoord, input.lightViewPos1, shadowMapBias) && !isInShadow(depthMapTexture[1], pTexCoord2, input.lightViewPos2, shadowMapBias)) {
+            //not in either shadow, therefore both lights
+            colour = calculateLighting(-direction[0], input.normal, diffuse[0]) + calculateLighting(-direction[1], input.normal, diffuse[1]);
+        }
+    }
     
     colour = saturate(colour + ambient[0] + ambient[1]);
     return saturate(colour) * textureColour;

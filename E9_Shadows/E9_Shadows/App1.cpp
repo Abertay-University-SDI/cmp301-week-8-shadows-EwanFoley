@@ -41,15 +41,15 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	light = new Light();
 	light->setAmbientColour(0.3f, 0.3f, 0.3f, 1.0f);
 	light->setDiffuseColour(1.0f, .0f, .0f, 1.0f);
-	light->setDirection(-0.7f, -0.7f, -0.7f);
-	light->setPosition(-50.f, 10.f, 10.f);
+	light->setDirection(-0.7f, -0.7f, 0.0f);
+	light->setPosition(-25.f, 10.f, 10.f);
 	light->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 
 	light2 = new Light();
 	light2->setAmbientColour(0.3f, 0.3f, 0.3f, 1.0f);
 	light2->setDiffuseColour(.0f, 1.0f, .0f, 1.0f);
-	light2->setDirection(0.7f, -0.7f, 0.7f);
-	light2->setPosition(50.f, 10.f, 10.f);
+	light2->setDirection(0.7f, -0.7f, 0.0f);
+	light2->setPosition(25.f, 10.f, 10.f);
 	light2->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 
 	lightDirection[0] = 0.0f;
